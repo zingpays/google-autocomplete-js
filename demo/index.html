@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google AutoComplete JS - CDN Demo</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background-color: #f5f5f5;
+    }
+
+    .demo-container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .output {
+      background-color: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 15px;
+      margin-top: 15px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      min-height: 40px;
+    }
+
+    .note {
+      background-color: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    .warning {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Google AutoComplete JS - CDN Demo</h1>
+
+  <div class="demo-container">
+    <div class="form-group">
+      <label for="autocomplete-input">Search Location:</label>
+      <div id="autocomplete-container"></div>
+    </div>
+
+    <div class="output" id="output"></div>
+  </div>
+
+
+  <!-- Include our built component (includes Google Maps API Loader) -->
+  <script src="./google-autocomplete.min.js"></script>
+
+  <script>
+    // Initialize the component using the CDN approach
+    const autocomplete = googleAutoComplete(document.getElementById('autocomplete-container'), {
+      apiKey: 'YOUR_GOOGLE_MAPS_API_KEY', // Replace with your actual API key
+      placeholder: 'Enter any location...',
+      onSelect: function (place) {
+        document.getElementById('output').textContent = `Selected: ${place.formattedAddress}`;
+        console.log('Full place object:', place.formattedAddress, place.location, place.addressComponents);
+      },
+      onInput: function (value) {
+        if (value.length > 2) {
+          document.getElementById('output').textContent = `Typing: "${value}"`;
+        } else if (value.length === 0) {
+          document.getElementById('output').textContent = 'Ready... (Enter a location to see autocomplete suggestions)';
+        }
+      },
+      onFocus: function () {
+        console.log('Input focused');
+      },
+      onBlur: function () {
+        console.log('Input blurred');
+      }
+    });
+
+    // Example of programmatic control
+    setTimeout(() => {
+      console.log('Component initialized:', autocomplete);
+      console.log('Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(autocomplete)));
+    }, 1000);
+  </script>
+</body>
+
+</html>

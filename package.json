@@ -1,0 +1,35 @@
+{
+  "name": "google-autocomplete-js",
+  "version": "1.0.0",
+  "description": "A vanilla JavaScript Google Places Autocomplete component that can be included via CDN",
+  "main": "dist/google-autocomplete.min.js",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "dev": "webpack serve --mode=development --open",
+    "demo": "http-server demo -p 3000"
+  },
+  "keywords": [
+    "google",
+    "autocomplete", 
+    "places",
+    "javascript",
+    "vanilla",
+    "component"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.2"
+  },
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3",
+    "http-server": "^14.1.1",
+    "@babel/core": "^7.23.5",
+    "@babel/preset-env": "^7.23.5",
+    "babel-loader": "^9.1.3"
+  }
+} 

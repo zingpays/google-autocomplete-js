@@ -1,0 +1,166 @@
+/* Main wrapper styles */
+.autoCompleteWrapper {
+  position: relative;
+  z-index: 9;
+}
+
+/* Input field styles */
+.autoCompleteWrapper .inputAutoComplete {
+  font-size: 0.875rem;
+  height: 2rem;
+  width: 100%;
+  border-radius: 0.25rem;
+  border: solid 0.0625rem #cecbcb;
+  padding: 0 0.6875rem;
+  color: rgba(0, 0, 0, 0.65);
+  box-sizing: border-box;
+}
+
+.autoCompleteWrapper .inputAutoComplete:hover,
+.autoCompleteWrapper .inputAutoComplete:focus-visible {
+  border-color: #cecbcb;
+  outline: none;
+}
+
+/* Error state */
+.autoCompleteWrapper .inputAutoComplete.error {
+  border: solid 0.0625rem #f41b14;
+}
+
+.autoCompleteWrapper .inputAutoComplete.error:hover,
+.autoCompleteWrapper .inputAutoComplete.error:focus-visible {
+  border-color: #f41b14;
+  outline: none;
+}
+
+/* Results container */
+.autoCompleteWrapper .results-container {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #cecbcb;
+  border-top: none;
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: left;
+  box-sizing: border-box;
+  border-radius: 0 0 0.25rem 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Suffix container */
+.autoCompleteWrapper .suffix {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  z-index: 2;
+  right: 12px;
+  top: 35%;
+}
+
+/* Placeholder styles */
+.autoCompleteWrapper input::-webkit-input-placeholder {
+  color: #bfbfbf;
+}
+
+.autoCompleteWrapper input:-moz-placeholder {
+  color: #bfbfbf;
+}
+
+.autoCompleteWrapper input::-moz-placeholder {
+  color: #bfbfbf;
+}
+
+.autoCompleteWrapper input::-ms-input-placeholder {
+  color: #bfbfbf;
+}
+
+/* Suggestion item styles */
+.suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 4px;
+}
+
+.suggestion-item:hover {
+  background-color: rgb(227, 227, 227);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-main-text {
+  font-weight: 600;
+  color: rgb(31, 31, 31);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.suggestion-secondary-text {
+  font-size: 12px;
+  color: rgb(94, 94, 94);
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.no-results,
+.error-message {
+  padding: 20px;
+  text-align: center;
+  color: rgb(94, 94, 94);
+  font-style: italic;
+}
+
+.error-message {
+  color: #e74c3c;
+}
+
+/* Responsive font sizing (basic implementation) */
+@media (max-width: 768px) {
+  .autoCompleteWrapper .inputAutoComplete {
+    font-size: 0.8rem;
+    height: 1.8rem;
+  }
+  
+  .suggestion-main-text {
+    font-size: 13px;
+  }
+  
+  .suggestion-secondary-text {
+    font-size: 11px;
+  }
+}
+
+/* Focus styles */
+.autoCompleteWrapper .inputAutoComplete:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+/* Disabled state */
+.autoCompleteWrapper .inputAutoComplete:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Loading state (optional) */
+.autoCompleteWrapper.loading .inputAutoComplete {
+  background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="%23999" d="M10 3v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L5.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6z"/><path fill="%23999" d="M17 10c0-1.57-.46-3.03-1.24-4.26L14.3 5.2c.45.83.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+} 

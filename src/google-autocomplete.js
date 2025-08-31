@@ -15,11 +15,11 @@ class GoogleAutoComplete {
       iso2: options.iso2 || "",
       language: options.language || (localStorage.getItem('lang') || 'en'),
       fields: options.fields || ['displayName', 'formattedAddress', 'location', 'addressComponents'],
-      onSelect: options.onSelect || (() => {}),
-      onInput: options.onInput || (() => {}),
-      onChange: options.onChange || (() => {}),
-      onFocus: options.onFocus || (() => {}),
-      onBlur: options.onBlur || (() => {}),
+      onSelect: options.onSelect || (() => { }),
+      onInput: options.onInput || (() => { }),
+      onChange: options.onChange || (() => { }),
+      onFocus: options.onFocus || (() => { }),
+      onBlur: options.onBlur || (() => { }),
       isDisabled: options.isDisabled || false,
       ...options
     };
@@ -31,7 +31,7 @@ class GoogleAutoComplete {
     this.google = null;
     this.newestRequestId = 0;
     this.showResult = false;
-    
+
     // 请求对象
     this.request = {
       input: '',
@@ -51,28 +51,28 @@ class GoogleAutoComplete {
   createWrapper() {
     // 清空原有内容
     this.element.innerHTML = '';
-    
+
     // 添加类名
-    this.element.classList.add('autoCompleteWrapper');
-    
+    this.element.classList.add('cuteid-auto-complete-wrapper');
+
     // 创建输入框
     this.input = document.createElement('input');
-    this.input.id = 'inputAutoComplete';
+    this.input.id = 'cuteid-input-auto-complete';
     this.input.type = 'text';
-    this.input.className = 'inputAutoComplete';
+    this.input.className = 'cuteid-input-auto-complete';
     this.input.placeholder = this.options.placeholder;
     this.input.disabled = this.options.isDisabled;
-    
+
     // 创建结果容器
     this.resultsContainer = document.createElement('div');
-    this.resultsContainer.id = 'results';
-    this.resultsContainer.className = 'results-container';
+    this.resultsContainer.id = 'cuteid-results';
+    this.resultsContainer.className = 'cuteid-results-container';
     this.resultsContainer.style.display = 'none';
-    
+
     // 创建后缀容器
     const suffix = document.createElement('section');
-    suffix.className = 'suffix';
-    
+    suffix.className = 'cuteid-suffix';
+
     // 添加到wrapper
     this.element.appendChild(this.input);
     this.element.appendChild(this.resultsContainer);
@@ -82,14 +82,14 @@ class GoogleAutoComplete {
   bindEvents() {
     // 输入事件
     this.input.addEventListener('input', (e) => this.makeAutocompleteRequest(e));
-    
+
     // 焦点事件
     this.input.addEventListener('focus', (e) => this.handleFocus(e));
     this.input.addEventListener('blur', (e) => this.options.onBlur(e));
-    
+
     // 变化事件
     this.input.addEventListener('change', (e) => this.options.onChange(e.target.value));
-    
+
     // ESC键隐藏结果
     this.input.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -97,7 +97,7 @@ class GoogleAutoComplete {
         this.hideResults();
       }
     });
-    
+
     // 全局点击事件
     document.addEventListener('click', (e) => this.handleGlobalClick(e));
   }
@@ -117,8 +117,6 @@ class GoogleAutoComplete {
 
       this.google = await this.loader.load();
       this.refreshToken();
-
-      console.log('Google Maps API 加载成功');
     } catch (error) {
       console.error('加载 Google Maps API 失败:', error);
     }
@@ -135,69 +133,70 @@ class GoogleAutoComplete {
   async onPlaceSelected(place) {
     // 使用配置的 fields 获取数据
     await place.fetchFields({ fields: this.options.fields });
-    
-    console.log('Selected place:', place);
-    
-      this.input.value = place.formattedAddress || place.displayName || '';
-    
+
+    this.input.value = place.formattedAddress || place.displayName || '';
+
     this.hideResults();
     // 直接返回整个 place 对象，让页面自行处理数据
     this.options.onSelect(place);
   }
 
   async makeAutocompleteRequest(inputEvent) {
-    console.log(inputEvent);
-    
+
     this.resultsContainer.innerHTML = '';
-    
+
     if (inputEvent.target.value === '') {
       this.hideResults();
     } else {
-      this.showResults();
       this.request.input = inputEvent.target.value;
       const requestId = ++this.newestRequestId;
-      
+
       try {
         const { suggestions } = await this.google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(this.request);
-        
+
         if (requestId !== this.newestRequestId) return;
-        
-        if (suggestions.length === 0) {
-          this.resultsContainer.innerHTML = '<div class="no-results">没有找到相关结果</div>';
-        }
-        
-        for (const suggestion of suggestions) {
-          const placePrediction = suggestion.placePrediction;
-          const suggestionItem = document.createElement('div');
-          suggestionItem.className = 'suggestion-item';
+
+        // 只有在有结果时才显示容器
+        if (suggestions.length > 0) {
+          this.showResults();
           
-          // 创建主文本
-          const mainText = document.createElement('div');
-          mainText.className = 'suggestion-main-text';
-          mainText.textContent = placePrediction.text.toString();
-          suggestionItem.appendChild(mainText);
-          
-          if (placePrediction.secondaryText) {
-            const secondaryText = document.createElement('div');
-            secondaryText.className = 'suggestion-secondary-text';
-            secondaryText.textContent = placePrediction.secondaryText.toString();
-            suggestionItem.appendChild(secondaryText);
+          for (const suggestion of suggestions) {
+            const placePrediction = suggestion.placePrediction;
+            const suggestionItem = document.createElement('div');
+            suggestionItem.className = 'cuteid-suggestion-item';
+
+            // 创建主文本
+            const mainText = document.createElement('div');
+            mainText.className = 'cuteid-suggestion-main-text';
+            mainText.textContent = placePrediction.text.toString();
+            suggestionItem.appendChild(mainText);
+
+            if (placePrediction.secondaryText) {
+              const secondaryText = document.createElement('div');
+              secondaryText.className = 'cuteid-suggestion-secondary-text';
+              secondaryText.textContent = placePrediction.secondaryText.toString();
+              suggestionItem.appendChild(secondaryText);
+            }
+
+            suggestionItem.addEventListener('click', (event) => {
+              // 阻止事件冒泡，避免触发全局点击事件
+              event.stopPropagation();
+              this.onPlaceSelected(placePrediction.toPlace());
+            });
+
+            this.resultsContainer.appendChild(suggestionItem);
           }
-
-          suggestionItem.addEventListener('click', (event) => {
-            // 阻止事件冒泡，避免触发全局点击事件
-            event.stopPropagation();
-            this.onPlaceSelected(placePrediction.toPlace());
-          });
-
-          this.resultsContainer.appendChild(suggestionItem);
+        } else {
+          // 没有结果时隐藏容器，不显示任何内容
+          this.hideResults();
         }
       } catch (error) {
         console.error('获取建议失败:', error);
-        this.resultsContainer.innerHTML = '<div class="error-message">获取建议失败，请稍后重试</div>';
+        // 错误时也隐藏容器，不显示错误信息
+        this.hideResults();
       }
     }
-    
+
     this.options.onInput(inputEvent.target.value);
   }
 
@@ -209,8 +208,10 @@ class GoogleAutoComplete {
   }
 
   handleFocus(e) {
-    // 如果输入框有内容且有结果，则显示结果容器
-    this.makeAutocompleteRequest(e);
+    // 只有在输入框有内容时才触发自动完成请求
+    if (e.target.value.trim() !== '') {
+      this.makeAutocompleteRequest(e);
+    }
     this.options.onFocus(e);
   }
 
@@ -251,7 +252,7 @@ class GoogleAutoComplete {
   destroy() {
     document.removeEventListener('click', this.handleGlobalClick);
     this.element.innerHTML = '';
-    this.element.classList.remove('autoCompleteWrapper');
+    this.element.classList.remove('cuteid-auto-complete-wrapper');
   }
 }
 

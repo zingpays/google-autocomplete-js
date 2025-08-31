@@ -1,11 +1,11 @@
 /* Main wrapper styles */
-.autoCompleteWrapper {
+.cuteid-auto-complete-wrapper {
   position: relative;
   z-index: 9;
 }
 
 /* Input field styles */
-.autoCompleteWrapper .inputAutoComplete {
+.cuteid-auto-complete-wrapper .cuteid-input-auto-complete {
   font-size: 0.875rem;
   height: 2rem;
   width: 100%;
@@ -16,42 +16,49 @@
   box-sizing: border-box;
 }
 
-.autoCompleteWrapper .inputAutoComplete:hover,
-.autoCompleteWrapper .inputAutoComplete:focus-visible {
+.cuteid-auto-complete-wrapper .cuteid-input-auto-complete:hover,
+.cuteid-auto-complete-wrapper .cuteid-input-auto-complete:focus-visible {
   border-color: #cecbcb;
   outline: none;
 }
 
 /* Error state */
-.autoCompleteWrapper .inputAutoComplete.error {
+.cuteid-auto-complete-wrapper .cuteid-input-auto-complete.error {
   border: solid 0.0625rem #f41b14;
 }
 
-.autoCompleteWrapper .inputAutoComplete.error:hover,
-.autoCompleteWrapper .inputAutoComplete.error:focus-visible {
+.cuteid-auto-complete-wrapper .cuteid-input-auto-complete.error:hover,
+.cuteid-auto-complete-wrapper .cuteid-input-auto-complete.error:focus-visible {
   border-color: #f41b14;
   outline: none;
 }
 
 /* Results container */
-.autoCompleteWrapper .results-container {
+.cuteid-auto-complete-wrapper .cuteid-results-container {
   position: absolute;
   top: calc(100% + 0.5rem);
   left: 0;
   width: 100%;
   background-color: #fff;
   border: 1px solid #cecbcb;
-  border-top: none;
   max-height: 300px;
   overflow-y: auto;
   text-align: left;
   box-sizing: border-box;
-  border-radius: 0 0 0.25rem 0.25rem;
+  border-radius: 0.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 0;
+}
+
+/* 当结果容器为空时隐藏边框 */
+.cuteid-auto-complete-wrapper .cuteid-results-container:empty {
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
 }
 
 /* Suffix container */
-.autoCompleteWrapper .suffix {
+.cuteid-auto-complete-wrapper .cuteid-suffix {
   display: flex;
   align-items: center;
   position: absolute;
@@ -61,24 +68,24 @@
 }
 
 /* Placeholder styles */
-.autoCompleteWrapper input::-webkit-input-placeholder {
+.cuteid-auto-complete-wrapper input::-webkit-input-placeholder {
   color: #bfbfbf;
 }
 
-.autoCompleteWrapper input:-moz-placeholder {
+.cuteid-auto-complete-wrapper input:-moz-placeholder {
   color: #bfbfbf;
 }
 
-.autoCompleteWrapper input::-moz-placeholder {
+.cuteid-auto-complete-wrapper input::-moz-placeholder {
   color: #bfbfbf;
 }
 
-.autoCompleteWrapper input::-ms-input-placeholder {
+.cuteid-auto-complete-wrapper input::-ms-input-placeholder {
   color: #bfbfbf;
 }
 
 /* Suggestion item styles */
-.suggestion-item {
+.cuteid-suggestion-item {
   padding: 8px 12px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -88,15 +95,15 @@
   border-radius: 4px;
 }
 
-.suggestion-item:hover {
+.cuteid-suggestion-item:hover {
   background-color: rgb(227, 227, 227);
 }
 
-.suggestion-item:last-child {
+.cuteid-suggestion-item:last-child {
   border-bottom: none;
 }
 
-.suggestion-main-text {
+.cuteid-suggestion-main-text {
   font-weight: 600;
   color: rgb(31, 31, 31);
   font-size: 14px;
@@ -106,7 +113,7 @@
   line-height: 1.2;
 }
 
-.suggestion-secondary-text {
+.cuteid-suggestion-secondary-text {
   font-size: 12px;
   color: rgb(94, 94, 94);
   font-weight: 400;
@@ -116,51 +123,77 @@
   line-height: 1.2;
 }
 
-.no-results,
-.error-message {
+.cuteid-no-results,
+.cuteid-error-message {
   padding: 20px;
   text-align: center;
   color: rgb(94, 94, 94);
   font-style: italic;
 }
 
-.error-message {
+.cuteid-error-message {
   color: #e74c3c;
 }
 
 /* Responsive font sizing (basic implementation) */
 @media (max-width: 768px) {
-  .autoCompleteWrapper .inputAutoComplete {
+  .cuteid-auto-complete-wrapper .cuteid-input-auto-complete {
     font-size: 0.8rem;
     height: 1.8rem;
   }
   
-  .suggestion-main-text {
+  .cuteid-suggestion-main-text {
     font-size: 13px;
   }
   
-  .suggestion-secondary-text {
+  .cuteid-suggestion-secondary-text {
     font-size: 11px;
   }
 }
 
 /* Focus styles */
-.autoCompleteWrapper .inputAutoComplete:focus {
+.cuteid-auto-complete-wrapper .cuteid-input-auto-complete:focus {
   border-color: #4CAF50;
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
 /* Disabled state */
-.autoCompleteWrapper .inputAutoComplete:disabled {
+.cuteid-auto-complete-wrapper .cuteid-input-auto-complete:disabled {
   background-color: #f5f5f5;
   color: #999;
   cursor: not-allowed;
 }
 
 /* Loading state (optional) */
-.autoCompleteWrapper.loading .inputAutoComplete {
+.cuteid-auto-complete-wrapper.loading .cuteid-input-auto-complete {
   background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="%23999" d="M10 3v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L5.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6z"/><path fill="%23999" d="M17 10c0-1.57-.46-3.03-1.24-4.26L14.3 5.2c.45.83.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8z"/></svg>');
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 16px;
+}
+
+/* 加载状态样式 */
+.cuteid-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.cuteid-loading::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ddd;
+  border-top: 2px solid #666;
+  border-radius: 50%;
+  animation: cuteid-spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes cuteid-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 } 

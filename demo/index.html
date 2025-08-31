@@ -87,13 +87,14 @@
   <script>
     // Initialize the component using the CDN approach
     const autocomplete = googleAutoComplete(document.getElementById('autocomplete-container'), {
-      apiKey: 'YOUR_GOOGLE_MAPS_API_KEY', // Replace with your actual API key
+      apiKey: 'AIzaSyCN3Gpqy5zwW9jB6Nuz5Ozsk0nnl6R57Kk', // Replace with your actual API key //AIzaSyCN3Gpqy5zwW9jB6Nuz5Ozsk0nnl6R57Kk
       placeholder: 'Enter any location...',
       onSelect: function (place) {
         document.getElementById('output').textContent = `Selected: ${place.formattedAddress}`;
         console.log('Full place object:', place.formattedAddress, place.location, place.addressComponents);
       },
       onInput: function (value) {
+        console.log('onInput', value);
         if (value.length > 2) {
           document.getElementById('output').textContent = `Typing: "${value}"`;
         } else if (value.length === 0) {

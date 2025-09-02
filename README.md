@@ -65,6 +65,11 @@ const autocomplete = googleAutoComplete(document.getElementById('my-autocomplete
 | `onChange` | function | () => {} | Callback when input changes |
 | `onFocus` | function | () => {} | Callback when input receives focus |
 | `onBlur` | function | () => {} | Callback when input loses focus |
+| `inputClass` | string | "cuteid-input-auto-complete" | Custom CSS class for input element |
+| `inputStyle` | object | {} | Custom inline styles for input element |
+| `resultsClass` | string | "cuteid-results-container" | Custom CSS class for results container |
+| `resultsStyle` | object | {} | Custom inline styles for results container |
+| `wrapperClass` | string | "cuteid-auto-complete-wrapper" | Custom CSS class for wrapper element |
 
 ## Examples
 
@@ -162,6 +167,60 @@ const autocomplete = googleAutoComplete(document.getElementById('autocomplete'),
 });
 ```
 
+### Custom Styling
+
+```javascript
+const autocomplete = googleAutoComplete(document.getElementById('autocomplete'), {
+    apiKey: 'YOUR_API_KEY',
+    placeholder: 'Search for a location...',
+    
+    // 自定义样式配置
+    inputClass: 'custom-input',
+    inputStyle: {
+        'font-family': 'Arial, sans-serif',
+        'font-size': '16px'
+    },
+    
+    resultsClass: 'custom-results',
+    resultsStyle: {
+        'z-index': '1000',
+        'max-height': '400px'
+    },
+    
+    wrapperClass: 'custom-wrapper',
+    
+    onSelect: function(place) {
+        console.log('Selected:', place.formattedAddress);
+    }
+});
+```
+
+对应的 CSS：
+
+```css
+.custom-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.custom-results {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+```
+
 ## Public Methods
 
 ### setValue(value)
@@ -191,6 +250,40 @@ Enable or disable the input.
 ```javascript
 autocomplete.setDisabled(true); // Disable
 autocomplete.setDisabled(false); // Enable
+```
+
+### updateInputStyle(style)
+Update input element inline styles.
+
+```javascript
+autocomplete.updateInputStyle({
+    'border-color': '#28a745',
+    'background-color': '#f8fff9'
+});
+```
+
+### updateResultsStyle(style)
+Update results container inline styles.
+
+```javascript
+autocomplete.updateResultsStyle({
+    'border-color': '#28a745',
+    'box-shadow': '0 4px 12px rgba(40, 167, 69, 0.15)'
+});
+```
+
+### updateInputClass(className)
+Update input element CSS class.
+
+```javascript
+autocomplete.updateInputClass('custom-input custom-input-success');
+```
+
+### updateResultsClass(className)
+Update results container CSS class.
+
+```javascript
+autocomplete.updateResultsClass('custom-results custom-results-success');
 ```
 
 ### updateRegion(iso2)

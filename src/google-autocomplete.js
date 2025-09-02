@@ -21,6 +21,12 @@ class GoogleAutoComplete {
       onFocus: options.onFocus || (() => { }),
       onBlur: options.onBlur || (() => { }),
       isDisabled: options.isDisabled || false,
+      // 样式配置
+      inputClass: options.inputClass || 'cuteid-input-auto-complete',
+      inputStyle: options.inputStyle || {},
+      resultsClass: options.resultsClass || 'cuteid-results-container',
+      resultsStyle: options.resultsStyle || {},
+      wrapperClass: options.wrapperClass || 'cuteid-auto-complete-wrapper',
       ...options
     };
 
@@ -54,29 +60,31 @@ class GoogleAutoComplete {
 
     // 添加类名
     this.element.classList.add('cuteid-auto-complete-wrapper');
+    this.element.classList.add(this.options.wrapperClass);
 
     // 创建输入框
     this.input = document.createElement('input');
     this.input.id = 'cuteid-input-auto-complete';
     this.input.type = 'text';
-    this.input.className = 'cuteid-input-auto-complete';
+    this.input.className = this.options.inputClass;
     this.input.placeholder = this.options.placeholder;
     this.input.disabled = this.options.isDisabled;
+    
+    // 应用自定义样式
+    Object.assign(this.input.style, this.options.inputStyle);
 
     // 创建结果容器
     this.resultsContainer = document.createElement('div');
     this.resultsContainer.id = 'cuteid-results';
-    this.resultsContainer.className = 'cuteid-results-container';
+    this.resultsContainer.className = this.options.resultsClass;
     this.resultsContainer.style.display = 'none';
-
-    // 创建后缀容器
-    const suffix = document.createElement('section');
-    suffix.className = 'cuteid-suffix';
+    
+    // 应用自定义样式
+    Object.assign(this.resultsContainer.style, this.options.resultsStyle);
 
     // 添加到wrapper
     this.element.appendChild(this.input);
     this.element.appendChild(this.resultsContainer);
-    this.element.appendChild(suffix);
   }
 
   bindEvents() {
@@ -248,11 +256,28 @@ class GoogleAutoComplete {
     this.request.includedRegionCodes = iso2 ? [iso2.toLowerCase()] : [];
   }
 
+  // 样式更新方法
+  updateInputStyle(style) {
+    Object.assign(this.input.style, style);
+  }
+
+  updateResultsStyle(style) {
+    Object.assign(this.resultsContainer.style, style);
+  }
+
+  updateInputClass(className) {
+    this.input.className = className;
+  }
+
+  updateResultsClass(className) {
+    this.resultsContainer.className = className;
+  }
+
   // 销毁方法
   destroy() {
     document.removeEventListener('click', this.handleGlobalClick);
     this.element.innerHTML = '';
-    this.element.classList.remove('cuteid-auto-complete-wrapper');
+    this.element.classList.remove(this.options.wrapperClass);
   }
 }
 

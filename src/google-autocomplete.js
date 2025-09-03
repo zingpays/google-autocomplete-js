@@ -64,7 +64,6 @@ class GoogleAutoComplete {
 
     // 创建输入框
     this.input = document.createElement('input');
-    this.input.id = 'cuteid-input-auto-complete';
     this.input.type = 'text';
     this.input.className = this.options.inputClass;
     this.input.placeholder = this.options.placeholder;
@@ -75,7 +74,6 @@ class GoogleAutoComplete {
 
     // 创建结果容器
     this.resultsContainer = document.createElement('div');
-    this.resultsContainer.id = 'cuteid-results';
     this.resultsContainer.className = this.options.resultsClass;
     this.resultsContainer.style.display = 'none';
     
@@ -139,14 +137,20 @@ class GoogleAutoComplete {
   }
 
   async onPlaceSelected(place) {
-    // 使用配置的 fields 获取数据
-    await place.fetchFields({ fields: this.options.fields });
+    try {
+      // 使用配置的 fields 获取数据
+      await place.fetchFields({ fields: this.options.fields });
 
-    this.input.value = place.formattedAddress || place.displayName || '';
+      this.input.value = place.formattedAddress || place.displayName || '';
 
-    this.hideResults();
-    // 直接返回整个 place 对象，让页面自行处理数据
-    this.options.onSelect(place);
+      this.hideResults();
+      // 直接返回整个 place 对象，让页面自行处理数据
+      this.options.onSelect(place);
+    } catch (error) {
+      console.error('处理选中地点失败:', error);
+      // 即使处理失败，也要隐藏结果容器
+      this.hideResults();
+    }
   }
 
   async makeAutocompleteRequest(inputEvent) {
@@ -156,6 +160,14 @@ class GoogleAutoComplete {
     if (inputEvent.target.value === '') {
       this.hideResults();
     } else {
+      // 检查Google服务是否可用
+      if (!this.google || !this.google.maps || !this.google.maps.places) {
+        console.warn('Google Maps API 不可用，跳过自动完成请求');
+        this.hideResults();
+        this.options.onInput(inputEvent.target.value);
+        return;
+      }
+
       this.request.input = inputEvent.target.value;
       const requestId = ++this.newestRequestId;
 

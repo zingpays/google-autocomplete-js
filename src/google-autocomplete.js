@@ -24,11 +24,11 @@ class GoogleAutoComplete {
       remote: options.remote || false, // 新增remote参数，默认为false
       remoteUrl: options.remoteUrl || 'https://feplaces.legendtrading.com/places/', // 远程服务地址
       // 样式配置
-      inputClass: options.inputClass || 'cuteid-input-auto-complete',
+      inputClass: options.inputClass || 'google-map-input-auto-complete',
       inputStyle: options.inputStyle || {},
-      resultsClass: options.resultsClass || 'cuteid-results-container',
+      resultsClass: options.resultsClass || 'google-map-results-container',
       resultsStyle: options.resultsStyle || {},
-      wrapperClass: options.wrapperClass || 'cuteid-auto-complete-wrapper',
+      wrapperClass: options.wrapperClass || 'google-map-auto-complete-wrapper',
       ...options
     };
 
@@ -61,7 +61,7 @@ class GoogleAutoComplete {
     this.element.innerHTML = '';
 
     // 添加类名
-    this.element.classList.add('cuteid-auto-complete-wrapper');
+    this.element.classList.add('google-map-auto-complete-wrapper');
     this.element.classList.add(this.options.wrapperClass);
 
     // 创建输入框
@@ -233,7 +233,7 @@ class GoogleAutoComplete {
           
           for (const suggestion of suggestions) {
             const suggestionItem = document.createElement('div');
-            suggestionItem.className = 'cuteid-suggestion-item';
+            suggestionItem.className = 'google-map-suggestion-item';
 
             if (this.options.remote) {
               // 处理远程服务的响应格式
@@ -265,13 +265,13 @@ class GoogleAutoComplete {
     
     // 创建主文本
     const mainText = document.createElement('div');
-    mainText.className = 'cuteid-suggestion-main-text';
+    mainText.className = 'google-map-suggestion-main-text';
     mainText.textContent = placePrediction.text.toString();
     suggestionItem.appendChild(mainText);
 
     if (placePrediction.secondaryText) {
       const secondaryText = document.createElement('div');
-      secondaryText.className = 'cuteid-suggestion-secondary-text';
+      secondaryText.className = 'google-map-suggestion-secondary-text';
       secondaryText.textContent = placePrediction.secondaryText.toString();
       suggestionItem.appendChild(secondaryText);
     }
@@ -291,7 +291,7 @@ class GoogleAutoComplete {
       
       // 创建主文本
       const mainText = document.createElement('div');
-      mainText.className = 'cuteid-suggestion-main-text';
+      mainText.className = 'google-map-suggestion-main-text';
       mainText.textContent = placePrediction.text.text;
       suggestionItem.appendChild(mainText);
 
@@ -306,7 +306,7 @@ class GoogleAutoComplete {
       
       // 创建主文本
       const mainText = document.createElement('div');
-      mainText.className = 'cuteid-suggestion-main-text';
+      mainText.className = 'google-map-suggestion-main-text';
       mainText.textContent = queryPrediction.text.text;
       suggestionItem.appendChild(mainText);
 

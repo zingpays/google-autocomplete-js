@@ -179,12 +179,31 @@
       <button class="control-btn info" onclick="resetStyles()">重置样式</button>
       <button class="control-btn primary" onclick="updateInputStyle()">更新输入框样式</button>
       <button class="control-btn success" onclick="updateResultsStyle()">更新结果框样式</button>
+      <button class="control-btn warning" onclick="toggleRemoteMode()">切换远程模式</button>
+      <button class="control-btn info" onclick="showCurrentMode()">显示当前模式</button>
     </div>
 
     <div class="output" id="output"></div>
     
     <div class="note">
-      <h3>🎨 新增样式配置功能说明</h3>
+      <h3>🎨 新增功能说明</h3>
+      
+      <h4>📡 远程服务支持</h4>
+      <p><strong>新增参数：</strong></p>
+      <ul>
+        <li><code>remote</code>: 是否使用远程服务，默认为false（使用Google Maps API）</li>
+        <li><code>remoteUrl</code>: 远程服务地址，默认为'http://localhost:3000/places/'</li>
+      </ul>
+      
+      <p><strong>使用方式：</strong></p>
+      <ul>
+        <li>设置 <code>remote: true</code> 使用自己的远程服务</li>
+        <li>设置 <code>remote: false</code> 或省略该参数使用Google Maps API</li>
+        <li>远程服务需要提供 <code>/autocomplete</code> 和 <code>/details</code> 接口</li>
+        <li>已针对 <code>legend-places</code> 服务进行优化，支持其响应拦截器格式</li>
+      </ul>
+      
+      <h4>🎨 样式配置功能</h4>
       <p><strong>构造函数样式选项：</strong></p>
       <ul>
         <li><code>inputClass</code>: 自定义输入框 CSS 类名</li>
@@ -202,7 +221,7 @@
         <li><code>updateResultsClass(className)</code>: 更新结果容器类名</li>
       </ul>
       
-      <p><strong>测试说明：</strong> 点击上方按钮可以测试各种样式配置功能，包括动态样式更新、类名切换等。</p>
+      <p><strong>测试说明：</strong> 点击上方按钮可以测试各种功能，包括样式配置、远程模式切换等。</p>
     </div>
   </div>
 
@@ -215,6 +234,10 @@
     const autocomplete = googleAutoComplete(document.getElementById('autocomplete-container'), {
       apiKey: 'AIzaSyCN3Gpqy5zwW9jB6Nuz5Ozsk0nnl6R57Kk', // Replace with your actual API key
       placeholder: 'Enter any location...',
+      
+      // 新增remote参数配置
+      remote: false, // 设置为true使用远程服务，false使用Google Maps API
+      remoteUrl: 'https://feplaces.legendtrading.com/places/', // 远程服务地址
       
       // 测试新的样式配置选项
       inputClass: 'custom-input',
@@ -230,8 +253,8 @@
       wrapperClass: 'custom-wrapper',
       
       onSelect: function (place) {
-        document.getElementById('output').textContent = `Selected: ${place.formattedAddress}`;
-        console.log('Full place object:', place.formattedAddress, place.location, place.addressComponents);
+        document.getElementById('output').textContent = `Selected: ${place.formattedAddress || place.displayName || place.query}`;
+        console.log('Full place object:', place);
       },
       onInput: function (value) {
         console.log('onInput', value);
@@ -339,6 +362,71 @@
       });
       
       document.getElementById('output').textContent = `🎨 结果框样式已更新，边框颜色: ${randomColor}`;
+    }
+
+    // 测试函数：切换远程模式
+    function toggleRemoteMode() {
+      // 注意：这个功能需要重新创建组件实例，因为remote参数在构造函数中设置
+      const currentValue = autocomplete.getValue();
+      const container = document.getElementById('autocomplete-container');
+      
+      // 销毁当前实例
+      autocomplete.destroy();
+      
+      // 重新创建实例，切换remote模式
+      const newAutocomplete = googleAutoComplete(container, {
+        apiKey: 'AIzaSyCN3Gpqy5zwW9jB6Nuz5Ozsk0nnl6R57Kk',
+        placeholder: 'Enter any location...',
+        remote: !autocomplete.options.remote, // 切换remote模式
+        remoteUrl: 'http://localhost:3000/places/',
+        inputClass: 'custom-input',
+        inputStyle: {
+          'font-weight': '500',
+          'letter-spacing': '0.5px'
+        },
+        resultsClass: 'custom-results',
+        resultsStyle: {
+          'z-index': '9999',
+          'max-height': '350px'
+        },
+        wrapperClass: 'custom-wrapper',
+        onSelect: function (place) {
+          document.getElementById('output').textContent = `Selected: ${place.formattedAddress || place.displayName || place.query}`;
+          console.log('Full place object:', place);
+        },
+        onInput: function (value) {
+          console.log('onInput', value);
+          if (value.length > 2) {
+            document.getElementById('output').textContent = `Typing: "${value}"`;
+          } else if (value.length === 0) {
+            document.getElementById('output').textContent = 'Ready... (Enter a location to see autocomplete suggestions)';
+          }
+        },
+        onFocus: function () {
+          console.log('Input focused');
+        },
+        onBlur: function () {
+          console.log('Input blurred');
+        }
+      });
+      
+      // 恢复输入值
+      if (currentValue) {
+        newAutocomplete.setValue(currentValue);
+      }
+      
+      // 更新全局变量
+      window.autocomplete = newAutocomplete;
+      
+      const mode = newAutocomplete.options.remote ? '远程服务模式' : 'Google Maps API模式';
+      document.getElementById('output').textContent = `🔄 已切换到${mode}`;
+    }
+
+    // 测试函数：显示当前模式
+    function showCurrentMode() {
+      const mode = autocomplete.options.remote ? '远程服务模式' : 'Google Maps API模式';
+      const url = autocomplete.options.remote ? autocomplete.options.remoteUrl : 'Google Maps API';
+      document.getElementById('output').textContent = `📡 当前模式: ${mode}\n服务地址: ${url}`;
     }
   </script>
 </body>

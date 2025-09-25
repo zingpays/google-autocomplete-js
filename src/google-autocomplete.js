@@ -21,6 +21,8 @@ class GoogleAutoComplete {
       onFocus: options.onFocus || (() => { }),
       onBlur: options.onBlur || (() => { }),
       isDisabled: options.isDisabled || false,
+      remote: options.remote || false, // 新增remote参数，默认为false
+      remoteUrl: options.remoteUrl || 'https://feplaces.legendtrading.com/places/', // 远程服务地址
       // 样式配置
       inputClass: options.inputClass || 'cuteid-input-auto-complete',
       inputStyle: options.inputStyle || {},
@@ -136,6 +138,45 @@ class GoogleAutoComplete {
     }
   }
 
+  // 调用远程服务的方法
+  async callRemoteService(input) {
+    try {
+      const params = new URLSearchParams({
+        input: input,
+        languageCode: this.options.language,
+        regionCode: this.options.iso2 || undefined,
+        includeQueryPredictions: 'true'
+      });
+
+      // 移除undefined参数
+      for (const [key, value] of params.entries()) {
+        if (value === 'undefined') {
+          params.delete(key);
+        }
+      }
+
+      const response = await fetch(`${this.options.remoteUrl}autocomplete?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // 处理legend-places服务的响应格式
+      // legend-places使用响应拦截器，返回格式为: { success: true, code: "100000", message: "", data: [{ suggestions: [...] }] }
+      if (data.success && data.data && data.data.length > 0) {
+        return data.data[0]; // 返回data数组中的第一个元素，它包含suggestions
+      }
+      
+      // 如果不是legend-places格式，直接返回原始数据
+      return data;
+    } catch (error) {
+      console.error('调用远程服务失败:', error);
+      throw error;
+    }
+  }
+
   async onPlaceSelected(place) {
     try {
       // 使用配置的 fields 获取数据
@@ -160,19 +201,29 @@ class GoogleAutoComplete {
     if (inputEvent.target.value === '') {
       this.hideResults();
     } else {
-      // 检查Google服务是否可用
-      if (!this.google || !this.google.maps || !this.google.maps.places) {
-        console.warn('Google Maps API 不可用，跳过自动完成请求');
-        this.hideResults();
-        this.options.onInput(inputEvent.target.value);
-        return;
-      }
-
-      this.request.input = inputEvent.target.value;
       const requestId = ++this.newestRequestId;
 
       try {
-        const { suggestions } = await this.google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(this.request);
+        let suggestions = [];
+
+        if (this.options.remote) {
+          // 使用远程服务
+          const data = await this.callRemoteService(inputEvent.target.value);
+          suggestions = data.suggestions || [];
+        } else {
+          // 使用Google Maps API
+          // 检查Google服务是否可用
+          if (!this.google || !this.google.maps || !this.google.maps.places) {
+            console.warn('Google Maps API 不可用，跳过自动完成请求');
+            this.hideResults();
+            this.options.onInput(inputEvent.target.value);
+            return;
+          }
+
+          this.request.input = inputEvent.target.value;
+          const { suggestions: googleSuggestions } = await this.google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(this.request);
+          suggestions = googleSuggestions;
+        }
 
         if (requestId !== this.newestRequestId) return;
 
@@ -181,28 +232,16 @@ class GoogleAutoComplete {
           this.showResults();
           
           for (const suggestion of suggestions) {
-            const placePrediction = suggestion.placePrediction;
             const suggestionItem = document.createElement('div');
             suggestionItem.className = 'cuteid-suggestion-item';
 
-            // 创建主文本
-            const mainText = document.createElement('div');
-            mainText.className = 'cuteid-suggestion-main-text';
-            mainText.textContent = placePrediction.text.toString();
-            suggestionItem.appendChild(mainText);
-
-            if (placePrediction.secondaryText) {
-              const secondaryText = document.createElement('div');
-              secondaryText.className = 'cuteid-suggestion-secondary-text';
-              secondaryText.textContent = placePrediction.secondaryText.toString();
-              suggestionItem.appendChild(secondaryText);
+            if (this.options.remote) {
+              // 处理远程服务的响应格式
+              this.handleRemoteSuggestion(suggestion, suggestionItem);
+            } else {
+              // 处理Google Maps API的响应格式
+              this.handleGoogleSuggestion(suggestion, suggestionItem);
             }
-
-            suggestionItem.addEventListener('click', (event) => {
-              // 阻止事件冒泡，避免触发全局点击事件
-              event.stopPropagation();
-              this.onPlaceSelected(placePrediction.toPlace());
-            });
 
             this.resultsContainer.appendChild(suggestionItem);
           }
@@ -218,6 +257,118 @@ class GoogleAutoComplete {
     }
 
     this.options.onInput(inputEvent.target.value);
+  }
+
+  // 处理Google Maps API的响应格式
+  handleGoogleSuggestion(suggestion, suggestionItem) {
+    const placePrediction = suggestion.placePrediction;
+    
+    // 创建主文本
+    const mainText = document.createElement('div');
+    mainText.className = 'cuteid-suggestion-main-text';
+    mainText.textContent = placePrediction.text.toString();
+    suggestionItem.appendChild(mainText);
+
+    if (placePrediction.secondaryText) {
+      const secondaryText = document.createElement('div');
+      secondaryText.className = 'cuteid-suggestion-secondary-text';
+      secondaryText.textContent = placePrediction.secondaryText.toString();
+      suggestionItem.appendChild(secondaryText);
+    }
+
+    suggestionItem.addEventListener('click', (event) => {
+      // 阻止事件冒泡，避免触发全局点击事件
+      event.stopPropagation();
+      this.onPlaceSelected(placePrediction.toPlace());
+    });
+  }
+
+  // 处理远程服务的响应格式
+  handleRemoteSuggestion(suggestion, suggestionItem) {
+    if (suggestion.placePrediction) {
+      // 处理地点预测
+      const placePrediction = suggestion.placePrediction;
+      
+      // 创建主文本
+      const mainText = document.createElement('div');
+      mainText.className = 'cuteid-suggestion-main-text';
+      mainText.textContent = placePrediction.text.text;
+      suggestionItem.appendChild(mainText);
+
+      suggestionItem.addEventListener('click', (event) => {
+        // 阻止事件冒泡，避免触发全局点击事件
+        event.stopPropagation();
+        this.onRemotePlaceSelected(placePrediction);
+      });
+    } else if (suggestion.queryPrediction) {
+      // 处理查询预测
+      const queryPrediction = suggestion.queryPrediction;
+      
+      // 创建主文本
+      const mainText = document.createElement('div');
+      mainText.className = 'cuteid-suggestion-main-text';
+      mainText.textContent = queryPrediction.text.text;
+      suggestionItem.appendChild(mainText);
+
+      suggestionItem.addEventListener('click', (event) => {
+        // 阻止事件冒泡，避免触发全局点击事件
+        event.stopPropagation();
+        this.onRemoteQuerySelected(queryPrediction);
+      });
+    }
+  }
+
+  // 处理远程服务地点选择
+  async onRemotePlaceSelected(placePrediction) {
+    try {
+      // 获取地点详情
+      const placeId = placePrediction.place;
+      const detailsResponse = await fetch(`${this.options.remoteUrl}details?placeId=${placeId}&languageCode=${this.options.language}&regionCode=${this.options.iso2 || ''}`);
+      
+      if (!detailsResponse.ok) {
+        throw new Error(`HTTP error! status: ${detailsResponse.status}`);
+      }
+      
+      const detailsData = await detailsResponse.json();
+      
+      // 处理legend-places服务的响应格式
+      let place;
+      if (detailsData.success && detailsData.data && detailsData.data.length > 0) {
+        place = detailsData.data[0].result; // legend-places格式: data[0].result
+      } else {
+        place = detailsData.result; // 直接格式
+      }
+      
+      // 设置输入框值
+      this.input.value = place.formattedAddress || place.displayName.text || '';
+      
+      this.hideResults();
+      
+      // 构造类似Google API的place对象
+      const placeObject = {
+        formattedAddress: place.formattedAddress,
+        displayName: place.displayName.text,
+        location: place.location,
+        addressComponents: place.addressComponents,
+        placeId: place.id,
+        types: place.types,
+        rating: place.rating,
+        userRatingCount: place.userRatingCount
+      };
+      
+      this.options.onSelect(placeObject);
+    } catch (error) {
+      console.error('处理远程地点选择失败:', error);
+      this.hideResults();
+    }
+  }
+
+  // 处理远程服务查询选择
+  onRemoteQuerySelected(queryPrediction) {
+    // 对于查询预测，直接设置输入框值
+    this.input.value = queryPrediction.text.text;
+    this.hideResults();
+    this.options.onSelect({ query: queryPrediction.text.text });
   }
 
   handleGlobalClick(event) {

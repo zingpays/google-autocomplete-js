@@ -5,6 +5,7 @@ A vanilla JavaScript Google Places Autocomplete component that can be easily inc
 ## Features
 
 - 🌍 Google Places API integration
+- 📡 Remote service support (new!)
 - 📱 Responsive design
 - 🎨 Customizable styling
 - 🔧 Programmatic control
@@ -59,6 +60,8 @@ const autocomplete = googleAutoComplete(document.getElementById('my-autocomplete
 | `iso2` | string | "" | ISO 2-letter country code to restrict results |
 | `language` | string | "en" | Language for results |
 | `isDisabled` | boolean | false | Whether the input is disabled |
+| `remote` | boolean | false | Whether to use remote service instead of Google Maps API |
+| `remoteUrl` | string | "http://localhost:3000/places/" | Base URL for remote service |
 | `fields` | array | ['displayName', 'formattedAddress', 'location', 'addressComponents'] | Fields to fetch from Google Places API |
 | `onSelect` | function | () => {} | Callback when a place is selected (receives full place object) |
 | `onInput` | function | () => {} | Callback when input value changes |
@@ -143,6 +146,41 @@ const autocomplete = googleAutoComplete(document.getElementById('autocomplete'),
         };
         
         console.log('Processed data:', locationData);
+    }
+});
+```
+
+### Remote Service Usage
+
+```javascript
+// Use your own remote service instead of Google Maps API
+const autocomplete = googleAutoComplete(document.getElementById('autocomplete'), {
+    apiKey: 'YOUR_API_KEY', // Still required but only used in non-remote mode
+    placeholder: 'Search locations...',
+    remote: true, // Enable remote service
+    remoteUrl: 'http://localhost:3000/places/', // Your service URL
+    onSelect: function(place) {
+        console.log('Selected from remote service:', place);
+        // place object contains:
+        // - formattedAddress: formatted address
+        // - displayName: display name
+        // - location: coordinates
+        // - placeId: place ID
+    }
+});
+```
+
+### Remote Service with Custom URL
+
+```javascript
+const autocomplete = googleAutoComplete(document.getElementById('autocomplete'), {
+    apiKey: 'YOUR_API_KEY',
+    remote: true,
+    remoteUrl: 'https://your-api.com/places/', // Custom service URL
+    language: 'zh-CN',
+    iso2: 'CN',
+    onSelect: function(place) {
+        console.log('Remote service result:', place);
     }
 });
 ```

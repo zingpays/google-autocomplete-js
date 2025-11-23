@@ -22,7 +22,7 @@ A vanilla JavaScript Google Places Autocomplete component that can be easily inc
 
 ```html
 <!-- Include the component (Google Maps API Loader is included) -->
-<script src="https://your-cdn.com/google-autocomplete.min.js"></script>
+<script src="https://asset.legendtrading.com/_upload/libs/google/google-autocomplete.min.js"></script>
 ```
 
 ### Via NPM

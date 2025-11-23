@@ -23,6 +23,7 @@ class GoogleAutoComplete {
       isDisabled: options.isDisabled || false,
       remote: options.remote || false, // 新增remote参数，默认为false
       remoteUrl: options.remoteUrl || 'https://feplaces.legendtrading.com/places/', // 远程服务地址
+      debounceDelay: options.debounceDelay !== undefined ? options.debounceDelay : 500, // 防抖延迟时间，默认500ms
       // 样式配置
       inputClass: options.inputClass || 'google-map-input-auto-complete',
       inputStyle: options.inputStyle || {},
@@ -39,6 +40,7 @@ class GoogleAutoComplete {
     this.google = null;
     this.newestRequestId = 0;
     this.showResult = false;
+    this.debounceTimeout = null; // 防抖定时器
 
     // 请求对象
     this.request = {
@@ -88,8 +90,18 @@ class GoogleAutoComplete {
   }
 
   bindEvents() {
-    // 输入事件
-    this.input.addEventListener('input', (e) => this.makeAutocompleteRequest(e));
+    // 输入事件 - 添加防抖
+    this.input.addEventListener('input', (e) => {
+      // 清除之前的定时器
+      if (this.debounceTimeout) {
+        clearTimeout(this.debounceTimeout);
+      }
+      
+      // 设置新的定时器
+      this.debounceTimeout = setTimeout(() => {
+        this.makeAutocompleteRequest(e);
+      }, this.options.debounceDelay);
+    });
 
     // 焦点事件
     this.input.addEventListener('focus', (e) => this.handleFocus(e));
@@ -438,6 +450,12 @@ class GoogleAutoComplete {
 
   // 销毁方法
   destroy() {
+    // 清除防抖定时器
+    if (this.debounceTimeout) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = null;
+    }
+    
     document.removeEventListener('click', this.handleGlobalClick);
     this.element.innerHTML = '';
     this.element.classList.remove(this.options.wrapperClass);

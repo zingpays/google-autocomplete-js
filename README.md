@@ -6,6 +6,7 @@ A vanilla JavaScript Google Places Autocomplete component that can be easily inc
 
 - 🌍 Google Places API integration
 - 📡 Remote service support (new!)
+- ⏱️ Input debounce (防抖功能，减少 API 请求)
 - 📱 Responsive design
 - 🎨 Customizable styling
 - 🔧 Programmatic control
@@ -62,6 +63,7 @@ const autocomplete = googleAutoComplete(document.getElementById('my-autocomplete
 | `isDisabled` | boolean | false | Whether the input is disabled |
 | `remote` | boolean | false | Whether to use remote service instead of Google Maps API |
 | `remoteUrl` | string | "http://localhost:3000/places/" | Base URL for remote service |
+| `debounceDelay` | number | 500 | Debounce delay in milliseconds for input requests |
 | `fields` | array | ['displayName', 'formattedAddress', 'location', 'addressComponents'] | Fields to fetch from Google Places API |
 | `onSelect` | function | () => {} | Callback when a place is selected (receives full place object) |
 | `onInput` | function | () => {} | Callback when input value changes |
@@ -201,6 +203,35 @@ const autocomplete = googleAutoComplete(document.getElementById('autocomplete'),
     },
     onBlur: function(event) {
         console.log('Input blurred');
+    }
+});
+```
+
+### Debounce Configuration
+
+```javascript
+// 使用默认的 500ms 防抖延迟
+const autocomplete = googleAutoComplete(document.getElementById('autocomplete'), {
+    apiKey: 'YOUR_API_KEY',
+    placeholder: 'Search locations...'
+    // debounceDelay: 500 (默认值)
+});
+
+// 自定义防抖延迟时间（例如 800ms）
+const autocompleteCustom = googleAutoComplete(document.getElementById('autocomplete2'), {
+    apiKey: 'YOUR_API_KEY',
+    debounceDelay: 800, // 输入后等待 800ms 才发起请求
+    onSelect: function(place) {
+        console.log('Selected:', place);
+    }
+});
+
+// 设置为 0 可以禁用防抖（每次输入立即请求）
+const autocompleteNoDebounce = googleAutoComplete(document.getElementById('autocomplete3'), {
+    apiKey: 'YOUR_API_KEY',
+    debounceDelay: 0, // 禁用防抖
+    onSelect: function(place) {
+        console.log('Selected:', place);
     }
 });
 ```

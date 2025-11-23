@@ -232,8 +232,9 @@
   <script>
     // Initialize the component using the CDN approach
     const autocomplete = googleAutoComplete(document.getElementById('autocomplete-container'), {
-      apiKey: 'AIzaSyCN3Gpqy5zwW9jB6Nuz5Ozsk0nnl6R57Kk', // Replace with your actual API key
+      apiKey: 'AIzaSyDbmQ8MHG9jV6wwg3z_n8Tjel5eYRI0yJg', // Replace with your actual API key
       placeholder: 'Enter any location...',
+      debounceDelay: 500,
       
       // 新增remote参数配置
       remote: false, // 设置为true使用远程服务，false使用Google Maps API

@@ -207,6 +207,8 @@ class GoogleAutoComplete {
   }
 
   async makeAutocompleteRequest(inputEvent) {
+    // 立即触发 onInput 回调，不等待网络请求
+    this.options.onInput(inputEvent.target.value);
 
     this.resultsContainer.innerHTML = '';
 
@@ -228,7 +230,6 @@ class GoogleAutoComplete {
           if (!this.google || !this.google.maps || !this.google.maps.places) {
             console.warn('Google Maps API 不可用，跳过自动完成请求');
             this.hideResults();
-            this.options.onInput(inputEvent.target.value);
             return;
           }
 
@@ -267,8 +268,6 @@ class GoogleAutoComplete {
         this.hideResults();
       }
     }
-
-    this.options.onInput(inputEvent.target.value);
   }
 
   // 处理Google Maps API的响应格式
